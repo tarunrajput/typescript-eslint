@@ -116,17 +116,21 @@ export default createRule({
     function getJsDocDeprecation(
       symbol: ts.Signature | ts.Symbol | undefined,
     ): string | undefined {
-      const tag = symbol
-        ?.getJsDocTags(checker)
-        .find(tag => tag.name === 'deprecated');
+      try {
+        const tag = symbol
+          ?.getJsDocTags(checker)
+          .find(tag => tag.name === 'deprecated');
 
-      if (!tag) {
-        return undefined;
+        if (!tag) {
+          return undefined;
+        }
+
+        const displayParts = tag.text;
+
+        return displayParts ? ts.displayPartsToString(displayParts) : '';
+      } catch {
+        return;
       }
-
-      const displayParts = tag.text;
-
-      return displayParts ? ts.displayPartsToString(displayParts) : '';
     }
 
     type CallLikeNode =
