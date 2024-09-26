@@ -207,6 +207,20 @@ ruleTester.run('no-deprecated', rule, {
       const [{ anchor = 'bar' }] = x;
     `,
     'function fn(/** @deprecated */ foo = 4) {}',
+
+    // this test is to ensure the rule doesn't crash when when calling getJsDocTags on getter of class that implements itself
+    // https://github.com/typescript-eslint/typescript-eslint/issues/10031
+    `
+      class Foo implements Foo {
+        get bar(): number {
+          return 42;
+        }
+
+        baz(): number {
+          return this.bar;
+        }
+      }
+    `,
   ],
   invalid: [
     {
@@ -683,7 +697,7 @@ ruleTester.run('no-deprecated', rule, {
           /** @deprecated */
           new (): string;
         };
-        
+
         new A();
       `,
       errors: [
@@ -859,9 +873,9 @@ ruleTester.run('no-deprecated', rule, {
             return '';
           }
         }
-        
+
         declare const a: A;
-        
+
         a.b();
       `,
       only: false,
